@@ -1,0 +1,22 @@
+# Dependencias y compilación
+node_modules/
+dist/
+dist-ssr/
+
+# Imágenes originales / Assets pesados
+img-originales/
+
+# Variables de entorno y credenciales
+.env
+.env.local
+.env.*.local
+
+# IDEs, editores y agentes
+.claude/
+.vscode/
+.idea/
+
+# Logs y temporales del sistema
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,716 @@
+<title>Banco de prompts AIMA</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Familjen+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#F7F7F6; --card:#FFFFFF; --sunk:#EDEDEB; --rule:#DBDBD6;
+  --ink:#232326; --soft:#66666B; --muted:#8E8E8A;
+  --rouge:#9B3B43; --rouge-soft:#F3E6E7; --rouge-line:#E2C9CB;
+  --code:#F1F1EF; --code-ink:#33333A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#151517; --card:#1C1C1F; --sunk:#232326; --rule:#34343A;
+    --ink:#ECECE8; --soft:#A6A6A2; --muted:#82827D;
+    --rouge:#DE9096; --rouge-soft:#2B1D1F; --rouge-line:#4A3134;
+    --code:#202024; --code-ink:#D2D2CC;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#151517; --card:#1C1C1F; --sunk:#232326; --rule:#34343A;
+  --ink:#ECECE8; --soft:#A6A6A2; --muted:#82827D;
+  --rouge:#DE9096; --rouge-soft:#2B1D1F; --rouge-line:#4A3134;
+  --code:#202024; --code-ink:#D2D2CC;
+}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:1rem;line-height:1.62;margin:0;-webkit-font-smoothing:antialiased}
+.wrap{max-width:64rem;margin:0 auto;padding:0 clamp(1.15rem,4vw,3rem)}
+.prose{max-width:62ch}
+.prose p{margin:0 0 1.05em}
+a{color:var(--rouge);text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--rouge);outline-offset:3px;border-radius:3px}
+
+h1.display,h2.display{font-family:"Familjen Grotesk",Archivo,sans-serif;font-weight:700;letter-spacing:-0.035em;line-height:0.98;text-wrap:balance;margin:0}
+h1.display{font-size:clamp(2.6rem,8vw,5.2rem)}
+h2.display{font-size:clamp(1.8rem,4.5vw,2.9rem);margin-bottom:1.3rem}
+h3{font-family:"Familjen Grotesk",Archivo,sans-serif;font-size:1.05rem;letter-spacing:-0.015em;margin:0}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:0.71rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin:0 0 0.9rem}
+.eyebrow b{color:var(--rouge);font-weight:500}
+.mono{font-family:"IBM Plex Mono",monospace;font-size:0.86em}
+.lede{font-size:1.12rem;line-height:1.55;color:var(--soft);max-width:56ch;margin:1.4rem 0 0}
+
+header.masthead{padding:clamp(2.5rem,7vw,4.5rem) 0 clamp(1.5rem,4vw,2.5rem)}
+section{padding:clamp(2.5rem,6vw,4rem) 0;border-top:1px solid var(--rule)}
+.band{background:var(--sunk)}
+
+.note{background:var(--rouge-soft);border:1px solid var(--rouge-line);border-left:2px solid var(--rouge);padding:0.95rem 1.1rem;margin:1.3rem 0;max-width:62ch;font-size:0.92rem;line-height:1.55}
+.note p{margin:0 0 0.6em}
+.note p:last-child{margin:0}
+
+ul.clean{list-style:none;padding:0;margin:1rem 0;display:grid;gap:0.6rem}
+ul.clean li{padding-left:1.05rem;position:relative;max-width:62ch}
+ul.clean li::before{content:"";position:absolute;left:0;top:0.7em;width:0.4rem;height:1px;background:var(--muted)}
+
+/* bloque copiable */
+.block{border:1px solid var(--rule);background:var(--card);margin-top:1.2rem}
+.block > header{display:flex;flex-wrap:wrap;gap:0.75rem 1rem;align-items:flex-start;padding:0.9rem 1rem;border-bottom:1px solid var(--rule)}
+.num{font-family:"IBM Plex Mono",monospace;font-size:0.78rem;color:var(--rouge);padding-top:0.15rem;letter-spacing:0.06em}
+.block .titles{flex:1 1 14rem;min-width:0}
+.slot{font-family:"IBM Plex Mono",monospace;font-size:0.71rem;color:var(--muted);margin:0.2rem 0 0;word-break:break-word}
+.badges{display:flex;flex-wrap:wrap;gap:0.35rem}
+.badge{font-family:"IBM Plex Mono",monospace;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.18rem 0.45rem;border:1px solid var(--rule);color:var(--soft);white-space:nowrap}
+.badge.m{border-color:var(--rouge-line);color:var(--rouge)}
+.focus{font-size:0.88rem;color:var(--soft);margin:0;padding:0.7rem 1rem;border-bottom:1px solid var(--rule);background:var(--sunk)}
+.focus b{color:var(--ink);font-weight:600}
+.codewrap{position:relative}
+pre{background:var(--code);color:var(--code-ink);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:0.78rem;line-height:1.62;padding:1rem 1.1rem;margin:0;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+.copy{position:absolute;top:0.55rem;right:0.55rem;font-family:"IBM Plex Mono",monospace;font-size:0.67rem;letter-spacing:0.09em;text-transform:uppercase;padding:0.32rem 0.7rem;background:var(--card);color:var(--soft);border:1px solid var(--rule);cursor:pointer;transition:color .15s,border-color .15s}
+.copy:hover{color:var(--ink);border-color:var(--muted)}
+.copy[data-done="1"]{color:var(--rouge);border-color:var(--rouge-line)}
+
+.tablewrap{overflow-x:auto;margin:1.3rem 0 0;border:1px solid var(--rule);background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:34rem;font-size:0.86rem}
+th,td{text-align:left;padding:0.58rem 0.8rem;border-bottom:1px solid var(--rule);vertical-align:top}
+thead th{font-family:"IBM Plex Mono",monospace;font-size:0.65rem;letter-spacing:0.11em;text-transform:uppercase;color:var(--muted);font-weight:400;background:var(--sunk);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td code,p code,li code{font-family:"IBM Plex Mono",monospace;font-size:0.84em;background:var(--sunk);padding:0.1rem 0.32rem;border-radius:3px}
+
+footer{padding:clamp(2rem,5vw,3rem) 0 4rem;border-top:1px solid var(--rule);color:var(--muted);font-size:0.85rem}
+@media (prefers-reduced-motion:reduce){*{transition-duration:0.01ms !important}}
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">Generación de imagen · Gemini · <b>17 prompts</b></p>
+    <h1 class="display">Banco de prompts AIMA</h1>
+    <p class="lede">Cada bloque es un prompt completo y autónomo: personaje, estilo, producto y escena ya combinados. Copiar, pegar en Gemini, generar. No hay que ensamblar nada.</p>
+  </div>
+</header>
+
+<section id="metodo">
+  <div class="wrap">
+    <p class="eyebrow">Antes de empezar</p>
+    <h2 class="display">La regla que hace que funcione</h2>
+
+    <div class="prose">
+      <p>rhode fotografía envases de 80 ml. Un objeto de ese tamaño sostiene un encuadre cerrado por sí solo. <strong>Una arracada de 20 mm no.</strong> De ahí salen las dos reglas que gobiernan todos estos prompts:</p>
+    </div>
+
+    <ul class="clean">
+      <li><strong>Recortes más agresivos que rhode.</strong> Oreja, cuello o muñeca llenando el cuadro — no la cara completa. Si se ve toda la cara, la joya se volvió un detalle y ya no es el sujeto.</li>
+      <li><strong>Piel siempre presente.</strong> Es la referencia de escala y de color. El acero dorado solo se lee como oro cuando hay piel al lado; solo sobre fondo neutro se ve como metal amarillo.</li>
+      <li><strong>Nunca fondo blanco puro.</strong> El plateado desaparece contra el blanco. Arena, hueso o lino sin planchar.</li>
+      <li><strong>Cero anillos en cuadro.</strong> AIMA no los vende. Una mano con anillos vende algo que no existe en el catálogo.</li>
+    </ul>
+
+    <div class="note">
+      <p><strong>Los seis bodegones de catálogo (05–10) son para el prototipo, no para vender.</strong> Una foto generada que no corresponde a la pieza que llega a la casa produce devoluciones y reseñas malas, y en joyería chica la diferencia se nota en la primera foto que la clienta se toma. Reemplazarlos por foto real antes de la primera venta.</p>
+      <p>Los de piel y ambiente (01–04, 11–17) aguantan mucho más: ahí lo que se vende es el look, no la pieza exacta.</p>
+    </div>
+
+    <h3 style="margin-top:2.2rem">Nota sobre Gemini</h3>
+    <div class="prose">
+      <p>Gemini no acepta parámetros tipo <code>--ar 3:4</code> ni <code>--v 7</code>. El encuadre va escrito en prosa dentro del prompt, y cada bloque ya lo trae. Si el resultado sale con proporción equivocada, se corrige pidiendo la relación de aspecto en la misma conversación en vez de reescribir el prompt.</p>
+      <p>Para mantener la misma cara entre generaciones: generar todas las tomas de una modelo <strong>en un solo hilo</strong>, y cuando una salga bien, adjuntarla como referencia en las siguientes.</p>
+    </div>
+  </div>
+</section>
+
+<section id="bloques" class="band">
+  <div class="wrap">
+    <p class="eyebrow">Referencia</p>
+    <h2 class="display">Los bloques</h2>
+    <div class="prose">
+      <p>Ya están incrustados en los 17 prompts. Se listan aparte por si hay que armar una toma nueva que no esté contemplada.</p>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">A</span>
+        <div class="titles"><h3>Cleo Hartmann — adaptada a AIMA</h3><p class="slot">la del stack · 19–26 · piel clara</p></div>
+        <div class="badges"><span class="badge m">personaje</span></div>
+      </header>
+      <p class="focus"><b>Ojo:</b> su ficha original pide fondo <code>muted dusty blue</code>. Ese fondo es de otro proyecto y apaga el dorado — aquí va sustituido por arena.</p>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Young European woman, mid-20s, oval face, thick natural brushed-up brows,
+light blue-gray almond eyes, small gold nose ring, dewy glowy skin with light
+freckles on nose and cheeks, glossy nude lips, shoulder-length platinum blonde
+hair with visible dark roots, slightly wavy and tousled, thin and lean build,
+long neck.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">B</span>
+        <div class="titles"><h3>Renata Solís</h3><p class="slot">la que se compra sola · 28–38 · piel media cálida</p></div>
+        <div class="badges"><span class="badge m">personaje</span></div>
+      </header>
+      <p class="focus"><b>Es la modelo de collares:</b> cuello largo y despejado, escote amplio, pelo detrás de la oreja.</p>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Mexican woman, early 30s, soft heart-shaped face, high cheekbones, defined
+jawline, thick natural dark brows with a marked arch, dark brown almond eyes,
+warm medium-tan skin, dewy with visible pore texture, small beauty mark on left
+cheekbone, full lips in warm nude satin, straight nose, no nose ring,
+collarbone-length dark brown wavy hair with warm highlights, center part,
+lean athletic build, long bare neck, long fingers.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">C</span>
+        <div class="titles"><h3>Estilo editorial</h3><p class="slot">hero · stack · catálogo · always on</p></div>
+        <div class="badges"><span class="badge">estilo</span></div>
+      </header>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Shot on medium format film, shallow depth of field, soft diffused window light
+from the side, warm sand seamless backdrop, light film grain, real skin texture
+with visible pores and natural shine, no retouching, no smoothing.
+Editorial candid style, never a posed catalog shot.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">D</span>
+        <div class="titles"><h3>Estilo candid</h3><p class="slot">comunidad · redes</p></div>
+        <div class="badges"><span class="badge">estilo</span></div>
+      </header>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Shot on an iPhone, direct on-camera flash, slightly blown-out highlights,
+visible digital grain, slightly crooked handheld framing, casual and unposed,
+authentic social media snapshot, not a professional photograph.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">E</span>
+        <div class="titles"><h3>Producto</h3><p class="slot">descripción fija del acero</p></div>
+        <div class="badges"><span class="badge">producto</span></div>
+      </header>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>AIMA jewelry: thin minimal stainless steel, highly polished, gold-tone and
+silver-tone finishes, smooth clean surfaces, no gemstones, no engraving,
+no charms, delicate scale.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">F</span>
+        <div class="titles"><h3>Negative prompt</h3><p class="slot">para plataformas que lo soporten</p></div>
+        <div class="badges"><span class="badge">negativo</span></div>
+      </header>
+      <p class="focus"><b><code>rings</code> va a propósito:</b> AIMA no vende anillos y una mano con anillos vende algo que no está en el catálogo.</p>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>ugly, deformed, extra limbs, extra fingers, cloned face, blurry, low quality,
+watermark, text, signature, oversaturated, HDR, harsh flash lighting,
+heavy makeup, artificial smile, stock photo pose, anime, illustration, cartoon,
+3D render, plastic skin, smoothed skin, pure white background,
+chunky jewelry, gemstones, diamonds, rings</pre></div>
+    </div>
+  </div>
+</section>
+
+<section id="hero">
+  <div class="wrap">
+    <p class="eyebrow">01 · Portada</p>
+    <h2 class="display">Hero</h2>
+    <div class="prose"><p>El titular <em>«arma tu stack. no te lo quitas.»</em> se imprime abajo a la izquierda sobre la foto. El prompt reserva ese espacio a propósito: si la modelo queda centrada, el texto le cae encima.</p></div>
+
+    <div class="block">
+      <header>
+        <span class="num">01</span>
+        <div class="titles"><h3>Cuello con el stack completo</h3><p class="slot">landing.tsx · HERO_IMAGE · /img/hero.jpg</p></div>
+        <div class="badges"><span class="badge m">Renata</span><span class="badge">editorial</span><span class="badge">3:2 horizontal</span></div>
+      </header>
+      <p class="focus"><b>Nítido:</b> las tres cadenas sobre la clavícula. El rostro puede ir suave.</p>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Mexican woman, early 30s, soft heart-shaped face, high cheekbones, defined
+jawline, thick natural dark brows, dark brown almond eyes, warm medium-tan skin,
+dewy with visible pore texture, small beauty mark on left cheekbone,
+collarbone-length dark brown wavy hair with warm highlights, long bare neck.
+
+Horizontal 3:2 composition. She stands in the RIGHT THIRD of the frame,
+head turned away and tilted slightly up, chin lifted so the neck is fully
+exposed. The LEFT TWO THIRDS are empty warm sand backdrop with nothing in them.
+Framing cuts at the jaw and mid-chest: this is a neck and collarbone photograph,
+not a portrait.
+
+She wears three layered chains: a thin gold-tone choker sitting tight at the
+base of the throat, a longer gold-tone figaro chain, and a fine silver-tone
+chain between them. Deliberate mix of gold and silver. Small gold hoop earring.
+Cream linen shirt open at the collar, wide neckline, shoulders bare.
+
+AIMA jewelry: thin minimal stainless steel, highly polished, gold-tone and
+silver-tone finishes, no gemstones, delicate scale.
+
+Shot on medium format film, shallow depth of field, soft diffused window light
+from the left, warm sand seamless backdrop, light film grain, real skin texture,
+no retouching. Editorial candid style.</pre></div>
+    </div>
+  </div>
+</section>
+
+<section id="stack" class="band">
+  <div class="wrap">
+    <p class="eyebrow">02–04 · El stack esencial</p>
+    <h2 class="display">Tres macros de piel</h2>
+    <div class="prose"><p>Van juntos en una fila de tres cuadrados. Se leen como serie, así que comparten luz, fondo y distancia. Cambia la parte del cuerpo, no el tratamiento.</p></div>
+
+    <div class="block">
+      <header>
+        <span class="num">02</span>
+        <div class="titles"><h3>Oreja con arracada</h3><p class="slot">landing.tsx · STACK[0] · /img/stack-arracada.jpg</p></div>
+        <div class="badges"><span class="badge m">Cleo</span><span class="badge">editorial</span><span class="badge">1:1</span></div>
+      </header>
+      <p class="focus"><b>Nítido:</b> el borde inferior de la arracada y el lóbulo.</p>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Young European woman, mid-20s, dewy glowy skin with light freckles,
+platinum blonde hair with visible dark roots.
+
+Extreme close-up, square 1:1. The frame is filled by ONE EAR, the jawline and a
+sliver of cheek. No eyes, no mouth, no full face. Hair tucked firmly behind the
+ear so nothing covers the lobe. Head turned in profile.
+
+She wears a single polished gold-tone hoop earring, 20 mm diameter, thin gauge,
+perfectly round and smooth. It hangs freely from the lobe and catches one soft
+highlight along its lower curve.
+
+AIMA jewelry: thin minimal stainless steel, highly polished, gold-tone finish,
+no gemstones, delicate scale.
+
+Shot on medium format film, macro, shallow depth of field with the hoop in sharp
+focus and the hair falling out of focus behind. Soft diffused window light from
+the side, warm sand backdrop, light film grain, visible skin pores and fine
+facial hair, no retouching.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">03</span>
+        <div class="titles"><h3>Garganta con choker</h3><p class="slot">landing.tsx · STACK[1] · /img/stack-choker.jpg</p></div>
+        <div class="badges"><span class="badge m">Renata</span><span class="badge">editorial</span><span class="badge">1:1</span></div>
+      </header>
+      <p class="focus"><b>Nítido:</b> los eslabones al centro de la garganta. Debe verse el grosor real de la cadena.</p>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Mexican woman, early 30s, warm medium-tan skin, dewy with visible pore texture,
+collarbone-length dark brown wavy hair.
+
+Extreme close-up, square 1:1. The frame is filled by the FRONT OF THE NECK and
+the top of the collarbones. Cropped at the chin and above the chest. No face
+visible. Chin lifted, neck long and stretched, hair pushed back off the shoulders.
+
+She wears a polished gold-tone rolo chain choker, 38 cm, 3 mm links, sitting
+snug at the base of the throat and following the curve of the neck. A single
+fine silver-tone chain sits just below it, deliberately mixing metals.
+
+AIMA jewelry: thin minimal stainless steel, highly polished, gold-tone and
+silver-tone, no gemstones, no pendant.
+
+Shot on medium format film, macro, shallow depth of field, individual chain links
+in sharp focus. Soft diffused window light from the side raking across the
+collarbone. Warm sand backdrop, light film grain, real skin texture,
+no retouching.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">04</span>
+        <div class="titles"><h3>Tobillo con tobillera</h3><p class="slot">landing.tsx · STACK[2] · /img/stack-tobillera.jpg</p></div>
+        <div class="badges"><span class="badge m">Renata</span><span class="badge">editorial</span><span class="badge">1:1</span></div>
+      </header>
+      <p class="focus"><b>Nítido:</b> la cadena sobre el hueso del tobillo.</p>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Warm medium-tan skin with natural texture, lean athletic legs, bare feet.
+
+Extreme close-up, square 1:1. The frame is filled by ONE ANKLE and the lower
+calf, cropped mid-shin and at the arch of the foot. The leg is bent, foot
+resting on a pale natural wooden floor. No face, no upper body.
+
+She wears a fine polished silver-tone anklet, 25 mm links, sitting loose just
+above the ankle bone, slightly slipped to one side as it would sit in real life.
+
+AIMA jewelry: thin minimal stainless steel, highly polished, silver-tone finish,
+no charms, delicate scale.
+
+Shot on medium format film, macro, shallow depth of field, the anklet in sharp
+focus and the floor falling soft. Soft diffused window light from above,
+warm sand and pale wood tones, light film grain, real skin texture,
+no retouching.</pre></div>
+    </div>
+  </div>
+</section>
+
+<section id="catalogo">
+  <div class="wrap">
+    <p class="eyebrow">05–10 · Fichas de producto</p>
+    <h2 class="display">Bodegones</h2>
+    <div class="prose"><p>Las seis tarjetas del catálogo. Comparten fondo, luz y distancia para que la retícula se lea pareja: mismo lino arena, misma luz lateral, misma altura de cámara. <strong>Estos seis son los que hay que rehacer con producto real antes de vender.</strong></p></div>
+
+    <div class="block">
+      <header>
+        <span class="num">05</span>
+        <div class="titles"><h3>arracada lisa · dorada</h3><p class="slot">PRODUCTS[0] · $590 · Ø20 mm · /img/p-arracada.jpg</p></div>
+        <div class="badges"><span class="badge">bodegón</span><span class="badge">4:5</span></div>
+      </header>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Product still life, vertical 4:5. A PAIR of polished gold-tone hoop earrings,
+20 mm diameter, thin round gauge, perfectly smooth, no gemstones. One hoop lies
+flat, the other rests leaning against it at a slight angle.
+
+They sit on unironed sand-colored linen fabric with soft natural creases.
+Never a pure white background. The jewelry fills about 65 percent of the frame.
+
+Macro product photography on medium format film, shallow depth of field,
+soft diffused window light from the left creating one long soft shadow to the
+right. Warm neutral color grade, light film grain. No props, no hands,
+no other objects, no reflections of a studio.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">06</span>
+        <div class="titles"><h3>cadena figaro · dorada</h3><p class="slot">PRODUCTS[1] · $890 · 45 cm · /img/p-figaro.jpg</p></div>
+        <div class="badges"><span class="badge">bodegón</span><span class="badge">4:5</span></div>
+      </header>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Product still life, vertical 4:5. A polished gold-tone figaro chain necklace,
+45 cm long, 2 mm links, loosely coiled into a soft irregular spiral so the
+alternating link pattern is clearly readable. Small lobster clasp visible.
+
+It rests on unironed sand-colored linen fabric with soft natural creases.
+Never a pure white background. The chain fills about 70 percent of the frame.
+
+Macro product photography on medium format film, shallow depth of field with the
+front of the coil sharp and the far edge falling soft. Soft diffused window light
+from the left. Warm neutral color grade, light film grain. No props, no hands.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">07</span>
+        <div class="titles"><h3>huggie perla · plateado</h3><p class="slot">PRODUCTS[2] · $690 · perla 8 mm · /img/p-perla.jpg</p></div>
+        <div class="badges"><span class="badge">bodegón</span><span class="badge">4:5</span></div>
+      </header>
+      <p class="focus"><b>Es la pieza de la excepción:</b> la única que sí se quita. La perla debe verse cálida y con lustre real, no como una bolita de plástico.</p>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Product still life, vertical 4:5. A PAIR of small polished silver-tone huggie
+hoop earrings, 10 mm diameter, each holding a single round pearl, 8 mm, with
+warm creamy luster and subtle natural surface variation. Not glossy plastic.
+
+They sit on unironed sand-colored linen fabric with soft natural creases.
+Never a pure white background. The earrings fill about 60 percent of the frame.
+
+Macro product photography on medium format film, very shallow depth of field
+with the pearls in sharp focus. Soft diffused window light from the left,
+gentle specular highlight across each pearl. Warm neutral color grade,
+light film grain. No props, no hands.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">08</span>
+        <div class="titles"><h3>pulsera eslabón · plateada</h3><p class="slot">PRODUCTS[3] · $690 · 18 cm · /img/p-pulsera.jpg</p></div>
+        <div class="badges"><span class="badge">bodegón</span><span class="badge">4:5</span></div>
+      </header>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Product still life, vertical 4:5. A polished silver-tone link bracelet, 18 cm,
+flat oval links 4 mm wide, laid in a relaxed open S-curve so the links catch
+light at different angles. Lobster clasp visible at one end.
+
+It rests on unironed sand-colored linen fabric with soft natural creases.
+Never a pure white background. The bracelet fills about 70 percent of the frame.
+
+Macro product photography on medium format film, shallow depth of field.
+Soft diffused window light from the left raking across the links so the
+silver reads warm and not gray. Warm neutral color grade, light film grain.
+No props, no hands.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">09</span>
+        <div class="titles"><h3>choker rolo · dorado</h3><p class="slot">PRODUCTS[4] · $790 · 38 cm · /img/p-choker.jpg</p></div>
+        <div class="badges"><span class="badge">bodegón</span><span class="badge">4:5</span></div>
+      </header>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Product still life, vertical 4:5. A polished gold-tone rolo chain choker, 38 cm,
+round uniform links 3 mm wide, arranged in a clean open circle with the clasp
+resting at the bottom of the frame.
+
+It rests on unironed sand-colored linen fabric with soft natural creases.
+Never a pure white background. The choker fills about 75 percent of the frame.
+
+Macro product photography on medium format film, shallow depth of field with the
+near arc of the circle sharp. Soft diffused window light from the left.
+Warm neutral color grade, light film grain. No props, no hands.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">10</span>
+        <div class="titles"><h3>tobillera fina · plateada</h3><p class="slot">PRODUCTS[5] · $490 · 25 cm · /img/p-tobillera.jpg</p></div>
+        <div class="badges"><span class="badge">bodegón</span><span class="badge">4:5</span></div>
+      </header>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Product still life, vertical 4:5. A very fine polished silver-tone anklet chain,
+25 cm, delicate 1.5 mm cable links, laid in a loose relaxed line that curves
+softly across the frame. Small clasp visible.
+
+It rests on unironed sand-colored linen fabric with soft natural creases.
+Never a pure white background. Because the chain is so thin, shoot closer:
+it should fill about 80 percent of the frame width.
+
+Macro product photography on medium format film, shallow depth of field.
+Soft diffused window light from the left so the thin chain reads clearly against
+the linen and does not disappear. Warm neutral color grade, light film grain.
+No props, no hands.</pre></div>
+    </div>
+  </div>
+</section>
+
+<section id="alwayson" class="band">
+  <div class="wrap">
+    <p class="eyebrow">11–14 · La prueba</p>
+    <h2 class="display">always on</h2>
+    <div class="prose"><p>Las cuatro imágenes más diferenciadoras del banco. Ninguna marca de joyería en México está mostrando esto, y es exactamente lo que hace creíble la promesa del acero: agua, sudor, cama, rutina.</p></div>
+
+    <div class="block">
+      <header>
+        <span class="num">11</span>
+        <div class="titles"><h3>agua</h3><p class="slot">landing.tsx · always on [0] · /img/on-agua.jpg</p></div>
+        <div class="badges"><span class="badge m">Renata</span><span class="badge">editorial</span><span class="badge">1:1</span></div>
+      </header>
+      <p class="focus"><b>Nítido:</b> una gota colgando de un eslabón. Ese es el detalle que vende toda la sección.</p>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Warm medium-tan skin, wet, with water droplets beaded across it.
+
+Extreme close-up, square 1:1. The frame is filled by a WET NECK AND COLLARBONE,
+cropped at the chin and mid-chest. No face. Dark wet hair pushed back, a few
+strands stuck to the skin. Fresh out of the shower or the pool.
+
+A polished gold-tone chain lies flat against the wet skin, water beading along
+it and one clear droplet hanging from a link. The metal is completely unaffected
+by the water: still bright, no dullness, no discoloration.
+
+AIMA jewelry: thin minimal stainless steel, highly polished, gold-tone,
+no gemstones.
+
+Shot on medium format film, macro, shallow depth of field with the hanging
+droplet in sharp focus. Soft diffused daylight, warm sand backdrop,
+light film grain, real wet skin texture, no retouching.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">12</span>
+        <div class="titles"><h3>gym</h3><p class="slot">landing.tsx · always on [1] · /img/on-gym.jpg</p></div>
+        <div class="badges"><span class="badge m">Cleo</span><span class="badge">editorial</span><span class="badge">1:1</span></div>
+      </header>
+      <p class="focus"><b>Nítido:</b> el sudor sobre la clavícula y la cadena encima. Aquí la luz sí puede ser más dura.</p>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Young European woman, mid-20s, light freckled skin, platinum blonde hair with
+dark roots, damp and pushed back with loose strands stuck to the temples.
+
+Close-up, square 1:1. Frame filled by the SIDE OF THE NECK, shoulder and
+collarbone, cropped below the mouth. Flushed skin with a real sheen of sweat.
+Gray sleeveless top strap visible. She is catching her breath after training.
+
+A fine gold-tone chain and a silver-tone chain sit layered against the damp skin,
+slightly displaced to one side by movement. The metal is unaffected by the sweat:
+still bright, no tarnish, no green marks on the skin.
+
+AIMA jewelry: thin minimal stainless steel, highly polished, gold-tone and
+silver-tone, no gemstones.
+
+Shot on medium format film, harder directional daylight from a high window,
+visible sweat highlights, shallow depth of field, warm neutral grade,
+light film grain, real skin texture with pores, no retouching.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">13</span>
+        <div class="titles"><h3>dormida</h3><p class="slot">landing.tsx · always on [2] · /img/on-dormida.jpg</p></div>
+        <div class="badges"><span class="badge m">Cleo</span><span class="badge">editorial</span><span class="badge">1:1</span></div>
+      </header>
+      <p class="focus"><b>Nítido:</b> la arracada contra la almohada. Debe leerse que ahí durmió, no que se acaba de arreglar.</p>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Young European woman, mid-20s, light freckled skin, no makeup, platinum blonde
+hair with dark roots, genuinely messy and slept-on.
+
+Close-up, square 1:1, camera looking down from above. She lies on a rumpled
+off-white linen pillow, head turned to the side, eyes closed or barely open,
+cheek pressed into the fabric. Frame cropped at the shoulder: half her face and
+a lot of pillow. Early soft morning light through a window.
+
+A small polished gold-tone hoop earring, 20 mm, is still in her ear, resting
+against the pillow fabric. She slept in it.
+
+AIMA jewelry: thin minimal stainless steel, highly polished, gold-tone,
+no gemstones.
+
+Shot on medium format film, shallow depth of field with the hoop sharp and the
+pillow creases falling soft. Warm low morning light, light film grain,
+bare unretouched skin, no makeup, no retouching.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">14</span>
+        <div class="titles"><h3>diario</h3><p class="slot">landing.tsx · always on [3] · /img/on-diario.jpg</p></div>
+        <div class="badges"><span class="badge m">Renata</span><span class="badge">editorial</span><span class="badge">1:1</span></div>
+      </header>
+      <p class="focus"><b>Nítido:</b> las pulseras en la muñeca. Ojo con las manos — pedir cinco dedos y cero anillos.</p>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Warm medium-tan hands with long fingers, short bare unpainted nails,
+five fingers per hand, no rings.
+
+Close-up, square 1:1. Frame filled by TWO HANDS wrapped around a plain ceramic
+mug in a warm off-white glaze, resting on a pale wooden table. Cropped at the
+forearms. No face, no body.
+
+On one wrist sit two stacked bracelets: a polished silver-tone link bracelet and
+a finer gold-tone chain, deliberately mixing metals, sitting loose and slightly
+rotated as they would in real life.
+
+AIMA jewelry: thin minimal stainless steel, highly polished, gold-tone and
+silver-tone, no gemstones, no rings.
+
+Shot on medium format film, shallow depth of field with the bracelets in sharp
+focus. Soft diffused morning window light from the left, warm sand and pale wood
+tones, light film grain, real skin texture, no retouching.</pre></div>
+    </div>
+  </div>
+</section>
+
+<section id="comunidad">
+  <div class="wrap">
+    <p class="eyebrow">15–17 · Comunidad</p>
+    <h2 class="display">Gen Z, sin producción</h2>
+    <div class="prose"><p>Estas tres tienen que verse <strong>peor</strong> a propósito. Flash directo, encuadre torcido, grano. Si salen bonitas y bien iluminadas, no funcionan: se leen como publicidad y pierden lo único que aportan, que es parecer reales.</p></div>
+
+    <div class="block">
+      <header>
+        <span class="num">15</span>
+        <div class="titles"><h3>mirror selfie con flash</h3><p class="slot">landing.tsx · comunidad [0] · /img/com-selfie.jpg</p></div>
+        <div class="badges"><span class="badge m">Cleo</span><span class="badge">candid</span><span class="badge">3:4</span></div>
+      </header>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Young European woman, mid-20s, platinum blonde hair with dark roots, light
+freckled skin, glossy nude lips.
+
+Vertical 3:4 bathroom mirror selfie taken at night. She holds the phone in front
+of her chest, the flash blowing out a bright circle in the middle of the mirror.
+Framing is crooked and a little too low. Tiled wall, a towel out of place,
+ordinary bathroom clutter on the counter. Nothing styled.
+
+She wears a gray tank top and three layered chains: a gold-tone choker, a longer
+gold-tone figaro chain and a fine silver-tone chain. Two small gold hoops.
+The flash makes the metal flare bright white where it hits.
+
+AIMA jewelry: thin minimal stainless steel, highly polished, gold-tone and
+silver-tone, no gemstones, no rings.
+
+Shot on an iPhone, direct on-camera flash, blown-out highlights, visible digital
+grain, harsh shadow behind her on the wall. Casual and unposed, authentic social
+media snapshot, not a professional photograph.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">16</span>
+        <div class="titles"><h3>en la calle, foto de una amiga</h3><p class="slot">landing.tsx · comunidad [1] · /img/com-calle.jpg</p></div>
+        <div class="badges"><span class="badge m">Renata</span><span class="badge">candid</span><span class="badge">3:4</span></div>
+      </header>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Mexican woman, early 30s, warm medium-tan skin, collarbone-length dark brown
+wavy hair, thick natural brows, no heavy makeup.
+
+Vertical 3:4 candid street photo taken by a friend on a phone, mid-afternoon.
+She is walking and half-turning back toward the camera, caught mid-step and
+mid-laugh, not posing. Slightly out of focus. Sunlight is patchy through trees.
+Background is an ordinary city street with a pale wall and parked cars,
+softly blurred.
+
+She wears an open cream linen shirt over a white tank, wide neckline, with a
+gold-tone choker and a longer figaro chain layered underneath. Small gold hoops
+catch the sun.
+
+AIMA jewelry: thin minimal stainless steel, highly polished, gold-tone,
+no gemstones, no rings.
+
+Shot on an iPhone, natural harsh afternoon daylight, slightly crooked handheld
+framing, visible digital grain, minor motion blur. Casual and unposed,
+authentic social media snapshot, not a professional photograph.</pre></div>
+    </div>
+
+    <div class="block">
+      <header>
+        <span class="num">17</span>
+        <div class="titles"><h3>muñecas juntas, mezclando metales</h3><p class="slot">landing.tsx · comunidad [2] · /img/com-manos.jpg</p></div>
+        <div class="badges"><span class="badge">ambas</span><span class="badge">candid</span><span class="badge">3:4</span></div>
+      </header>
+      <p class="focus"><b>Es la foto que explica el stack sin texto:</b> dos personas, cuatro piezas, dorado y plateado revueltos.</p>
+      <div class="codewrap"><button class="copy" type="button">copiar</button><pre>Two women's forearms and wrists side by side, one with light freckled skin,
+one with warm medium-tan skin. Short bare nails, no rings, five fingers each.
+
+Vertical 3:4 candid phone photo taken at night at a restaurant table. Both women
+extend their wrists toward the camera to compare bracelets, hands relaxed and
+slightly overlapping. Wooden table, a glass and a crumpled napkin at the edge of
+frame. Nobody's face is visible, cropped at the elbows.
+
+Between them they wear four pieces: a silver-tone link bracelet, a fine gold-tone
+chain bracelet, a thin gold anklet-style chain worn on the wrist, and a delicate
+silver chain. Gold and silver deliberately mixed across both arms.
+
+AIMA jewelry: thin minimal stainless steel, highly polished, gold-tone and
+silver-tone, no gemstones, no rings.
+
+Shot on an iPhone, direct on-camera flash at night, bright hot highlights on the
+metal, dark falloff in the background, visible digital grain, slightly crooked
+framing. Casual and unposed, authentic social media snapshot.</pre></div>
+    </div>
+  </div>
+</section>
+
+<section id="despues" class="band">
+  <div class="wrap">
+    <p class="eyebrow">Después de generar</p>
+    <h2 class="display">Dónde va cada una</h2>
+
+    <div class="note">
+      <p><strong>No hay nada que registrar en el código.</strong> Basta con guardar el archivo en <code>public/img/</code> con el nombre que dice cada prompt. La ruta se deduce del nombre, y si el archivo todavía no existe, ese hueco se queda con su degradado de acabado en vez de mostrar un icono roto. Se pueden ir poniendo de una en una.</p>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Prompts</th><th>Archivo</th><th>Dónde aparece</th></tr></thead>
+        <tbody>
+          <tr><td>01</td><td><code>public/img/hero.jpg</code></td><td>Portada</td></tr>
+          <tr><td>02–04</td><td><code>public/img/stack-*.jpg</code></td><td>Sección «el stack esencial»</td></tr>
+          <tr><td>05–10</td><td><code>public/img/p-*.jpg</code></td><td>Tarjetas del catálogo</td></tr>
+          <tr><td>11–14</td><td><code>public/img/on-*.jpg</code></td><td>Sección «always on»</td></tr>
+          <tr><td>15–17</td><td><code>public/img/com-*.jpg</code></td><td>Comunidad</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:2rem">Antes de subirlas</h3>
+    <ul class="clean">
+      <li><strong>Comprimir siempre. Es el error caro.</strong> Gemini exporta los JPEG casi sin comprimir: en la primera tanda, 17 imágenes pesaban <strong>41 MB</strong> — más de 3 MB cada una. Recomprimidas a calidad 82 y 1000 px de lado quedaron en <strong>2 MB en total, un 95&nbsp;% menos</strong>, sin diferencia visible en pantalla. Una página de 41 MB es inusable en datos móviles, que es exactamente como compra la clienta.</li>
+      <li><strong>1000 px de lado es suficiente.</strong> Las tarjetas se muestran a unos 380 px; 1000 da margen de sobra incluso en pantallas retina. Solo el hero justifica más.</li>
+      <li><strong>Revisar manos y dedos.</strong> Es donde la generación falla más. Cuenta cinco dedos y verifica que no haya anillos.</li>
+      <li><strong>Revisar que el metal no se vea grueso.</strong> Los modelos tienden a engordar la joyería. Si la cadena parece de 8 mm, descártala: contradice el catálogo.</li>
+      <li><strong>Mantener la excepción de la perla.</strong> La pieza con perla no puede aparecer en las fotos de agua, gym ni regadera. Es la única que sí se quita, y mostrarla mojada contradice lo que dice la ficha.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="eyebrow">Fichas de personaje</p>
+    <p style="max-width:62ch;margin:0">Los bloques de personaje salen de <span class="mono">CLEO-description.md</span> (con el fondo azul sustituido por arena) y de <span class="mono">RENATA-description.md</span>. Las reglas de fotografía, paleta y catálogo vienen del <span class="mono">manual-aima.html</span>. Si algo aquí contradice al manual, gana el manual.</p>
+  </div>
+</footer>
+
+<script>
+document.addEventListener('click', function(e){
+  var btn = e.target.closest('.copy');
+  if(!btn) return;
+  var pre = btn.parentElement.querySelector('pre');
+  if(!pre) return;
+  var restore = function(msg){
+    btn.textContent = msg;
+    btn.dataset.done = '1';
+    setTimeout(function(){ btn.textContent = 'copiar'; btn.dataset.done = ''; }, 1600);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(pre.textContent).then(function(){ restore('copiado'); },
+      function(){ restore('selecciona y copia'); });
+  } else {
+    var r = document.createRange();
+    r.selectNodeContents(pre);
+    var s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+    restore('selecciona y copia');
+  }
+});
+</script>

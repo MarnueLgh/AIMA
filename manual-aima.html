@@ -1,0 +1,639 @@
+<title>Manual de AIMA</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aboreto&family=Archivo:wght@400;500;600&family=Familjen+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#F7F7F6;
+  --card:#FFFFFF;
+  --sunk:#EDEDEB;
+  --rule:#DBDBD6;
+  --ink:#232326;
+  --soft:#66666B;
+  --muted:#8E8E8A;
+  --rouge:#9B3B43;
+  --rouge-soft:#F3E6E7;
+  --rouge-line:#E2C9CB;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#151517;
+    --card:#1C1C1F;
+    --sunk:#232326;
+    --rule:#34343A;
+    --ink:#ECECE8;
+    --soft:#A6A6A2;
+    --muted:#82827D;
+    --rouge:#DE9096;
+    --rouge-soft:#2B1D1F;
+    --rouge-line:#4A3134;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#151517;
+  --card:#1C1C1F;
+  --sunk:#232326;
+  --rule:#34343A;
+  --ink:#ECECE8;
+  --soft:#A6A6A2;
+  --muted:#82827D;
+  --rouge:#DE9096;
+  --rouge-soft:#2B1D1F;
+  --rouge-line:#4A3134;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:Archivo,"Helvetica Neue",Arial,sans-serif;
+  font-size:1rem;
+  line-height:1.62;
+  margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:74rem;margin:0 auto;padding:0 clamp(1.15rem,4vw,3.25rem)}
+.prose{max-width:64ch}
+.prose p{margin:0 0 1.05em}
+a{color:var(--rouge);text-decoration-thickness:1px;text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--rouge);outline-offset:3px;border-radius:2px}
+
+h2.display,h1.display{
+  font-family:"Familjen Grotesk",Archivo,Arial,sans-serif;
+  font-weight:700;
+  letter-spacing:-0.035em;
+  line-height:0.98;
+  text-wrap:balance;
+  margin:0;
+}
+h1.display{font-size:clamp(2.9rem,9vw,6.2rem)}
+h2.display{font-size:clamp(2rem,5.5vw,3.6rem);margin-bottom:1.5rem}
+h3{font-family:"Familjen Grotesk",Archivo,sans-serif;font-size:1.15rem;letter-spacing:-0.015em;margin:2.5rem 0 0.55rem}
+h4{font-size:0.92rem;margin:1.7rem 0 0.45rem;color:var(--soft);font-weight:600}
+strong{font-weight:600}
+
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  font-size:0.71rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 0.9rem;
+}
+.eyebrow b{color:var(--rouge);font-weight:500}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:0.86em}
+.lede{font-size:1.15rem;line-height:1.55;color:var(--soft);max-width:58ch;margin:1.5rem 0 0}
+
+.masthead{padding:clamp(2.75rem,8vw,5.5rem) 0 clamp(1.75rem,4vw,3rem)}
+
+.spec{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));
+  border-top:1px solid var(--rule);margin-top:clamp(2rem,5vw,3rem);
+}
+.spec div{padding:1rem 1.2rem 1.15rem 0;border-bottom:1px solid var(--rule)}
+.spec dt{font-family:"IBM Plex Mono",monospace;font-size:0.67rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem}
+.spec dd{margin:0;font-size:0.96rem;font-weight:500;line-height:1.32}
+.spec dd span{display:block;font-weight:400;color:var(--soft);font-size:0.83rem;margin-top:0.15rem}
+
+section{padding:clamp(2.75rem,6.5vw,4.75rem) 0;border-top:1px solid var(--rule)}
+.band{background:var(--sunk)}
+
+.tablewrap{overflow-x:auto;margin:1.4rem 0 0;border:1px solid var(--rule);background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:38rem;font-size:0.87rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:0.62rem 0.85rem;border-bottom:1px solid var(--rule);vertical-align:top}
+thead th{
+  font-family:"IBM Plex Mono",monospace;font-size:0.66rem;letter-spacing:0.11em;text-transform:uppercase;
+  color:var(--muted);font-weight:400;background:var(--sunk);white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:0}
+td .mm{font-family:"IBM Plex Mono",monospace;font-size:0.82em;color:var(--soft);white-space:nowrap}
+td .price{font-family:"IBM Plex Mono",monospace;font-weight:500;white-space:nowrap}
+
+pre{
+  background:var(--card);color:var(--ink);border:1px solid var(--rule);border-left:2px solid var(--rouge);
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:0.79rem;line-height:1.62;
+  padding:1rem 1.1rem;overflow-x:auto;margin:1.2rem 0;
+}
+p code,li code,td code{font-family:"IBM Plex Mono",monospace;font-size:0.85em;background:var(--sunk);padding:0.1rem 0.32rem;border-radius:3px}
+
+ul.clean{list-style:none;padding:0;margin:1.05rem 0;display:grid;gap:0.65rem}
+ul.clean li{padding-left:1.05rem;position:relative;max-width:64ch}
+ul.clean li::before{content:"";position:absolute;left:0;top:0.7em;width:0.4rem;height:1px;background:var(--muted)}
+
+.note{
+  background:var(--rouge-soft);border:1px solid var(--rouge-line);border-left:2px solid var(--rouge);
+  padding:0.95rem 1.1rem;margin:1.4rem 0;max-width:64ch;font-size:0.92rem;line-height:1.55;
+}
+.note p{margin:0 0 0.6em}
+.note p:last-child{margin:0}
+
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(19rem,1fr));gap:clamp(1.4rem,4vw,2.75rem);align-items:start}
+
+/* dos clientas */
+.who{background:var(--card);border:1px solid var(--rule);padding:1.35rem 1.4rem 1.5rem}
+.who .tag{font-family:"IBM Plex Mono",monospace;font-size:0.66rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--rouge);display:block;margin-bottom:0.5rem}
+.who h3{margin:0 0 0.15rem;font-size:1.3rem}
+.who .age{font-family:"IBM Plex Mono",monospace;font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.9rem}
+.who dl{margin:0;display:grid;gap:0.7rem}
+.who dt{font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.who dd{margin:0.1rem 0 0;font-size:0.9rem;line-height:1.5}
+.who .quote{margin-top:1.1rem;padding-top:0.9rem;border-top:1px solid var(--rule);font-size:0.92rem;color:var(--soft);font-style:italic}
+
+/* swatches de marca — color literal a propósito: es un espécimen */
+.swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:1.5rem}
+.sw{background:var(--card);padding:0}
+.sw .chip{height:4.75rem;display:block;border-bottom:1px solid var(--rule)}
+.sw .meta{padding:0.6rem 0.75rem 0.85rem}
+.sw code{font-family:"IBM Plex Mono",monospace;font-size:0.79rem;display:block}
+.sw small{display:block;color:var(--muted);font-size:0.72rem;margin-top:0.22rem;line-height:1.35}
+
+/* espécimen tipográfico */
+.specimen{border:1px solid var(--rule);background:var(--card);padding:clamp(1.3rem,3.5vw,2rem);margin-top:1.5rem}
+.specimen .label{font-family:"IBM Plex Mono",monospace;font-size:0.66rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:1rem}
+.wordmark{font-family:Aboreto,Georgia,serif;font-size:clamp(2.6rem,9vw,4.75rem);letter-spacing:0.24em;line-height:1;margin:0 0 0.15rem;text-indent:0.24em}
+.wordmark-note{font-family:"IBM Plex Mono",monospace;font-size:0.74rem;color:var(--muted);margin:0.6rem 0 0}
+.sans-spec{font-family:"Instrument Sans",Archivo,sans-serif}
+.sans-spec .big{font-size:1.75rem;line-height:1.25;letter-spacing:-0.02em;margin:0 0 0.7rem;font-weight:400}
+.sans-spec .lbl{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.09em;font-weight:600;margin:0 0 0.5rem}
+.sans-spec .bd{font-size:0.95rem;margin:0;color:var(--soft);max-width:52ch}
+
+/* vista previa de la marca aplicada — paleta AIMA literal, siempre clara */
+.preview{
+  margin-top:1.6rem;border:1px solid var(--rule);
+  background:#F4F1EC;color:#26262A;
+  padding:clamp(1.4rem,4vw,2.5rem);
+  font-family:"Instrument Sans",Archivo,sans-serif;
+}
+.preview .pvlabel{font-family:"IBM Plex Mono",monospace;font-size:0.66rem;letter-spacing:0.13em;text-transform:uppercase;color:#6B6A67;display:block;margin-bottom:1.4rem}
+.pvcard{background:#FDFCFA;border-radius:12px;padding:1.15rem 1.25rem 1.35rem;max-width:21rem;display:grid;gap:0.15rem}
+.pvcard .pvmark{font-family:Aboreto,Georgia,serif;font-size:0.9rem;letter-spacing:0.3em;margin:0 0 1.1rem;color:#26262A}
+.pvswatch{height:7.5rem;border-radius:8px;margin-bottom:1rem;background:linear-gradient(135deg,#E8E1D6 0%,#D8CDBA 42%,#C4A87A 72%,#E8E1D6 100%)}
+.pvcard .pvname{font-size:1.02rem;font-weight:500;margin:0;letter-spacing:-0.01em}
+.pvcard .pvspec{font-family:"IBM Plex Mono",monospace;font-size:0.72rem;color:#6B6A67;margin:0.2rem 0 0.9rem;letter-spacing:0.02em}
+.pvcard .pvprice{font-family:"IBM Plex Mono",monospace;font-size:0.95rem;font-weight:500;margin:0 0 1rem}
+
+/* botón de relleno direccional — la micro-interacción que se lleva al sitio */
+.rb{
+  position:relative;overflow:hidden;border:0;background:transparent;cursor:pointer;
+  color:#26262A;box-shadow:inset 0 0 0 1px #26262A;border-radius:999px;
+  font-family:inherit;font-size:0.78rem;font-weight:500;letter-spacing:0.02em;
+  padding:0.6rem 1.9rem;line-height:1.5;width:fit-content;
+}
+.rb-hit{position:absolute;inset:0;z-index:2;clip-path:var(--hit)}
+.rb-hit[data-i="1"]{--hit:polygon(0 0,100% 0,50% 50%)}
+.rb-hit[data-i="2"]{--hit:polygon(100% 0,100% 100%,50% 50%)}
+.rb-hit[data-i="3"]{--hit:polygon(0 100%,100% 100%,50% 50%)}
+.rb-hit[data-i="4"]{--hit:polygon(0 0,0 100%,50% 50%)}
+.rb-fill{
+  position:absolute;inset:0;display:inline-flex;align-items:center;justify-content:center;
+  background:#26262A;color:#FDFCFA;border-radius:999px;
+  clip-path:var(--clip);opacity:0;visibility:hidden;
+  transition:clip-path .25s ease,opacity 0s .25s,visibility 0s .25s;
+  font-size:0.78rem;font-weight:500;letter-spacing:0.02em;
+}
+.rb-fill[data-i="1"]{--clip:inset(0 0 100% 0 round 999px)}
+.rb-fill[data-i="2"]{--clip:inset(0 0 0 100% round 999px)}
+.rb-fill[data-i="3"]{--clip:inset(100% 0 0 0 round 999px)}
+.rb-fill[data-i="4"]{--clip:inset(0 100% 0 0 round 999px)}
+.rb-hit[data-i="1"]:hover ~ .rb-fill[data-i="1"],
+.rb-hit[data-i="2"]:hover ~ .rb-fill[data-i="2"],
+.rb-hit[data-i="3"]:hover ~ .rb-fill[data-i="3"],
+.rb-hit[data-i="4"]:hover ~ .rb-fill[data-i="4"]{
+  --clip:inset(0 0 0 0 round 999px);
+  opacity:1;visibility:visible;
+  transition:clip-path .25s ease,opacity 0s,visibility 0s;
+}
+
+/* banco de copy */
+.copy{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:1.5rem}
+.copy div{background:var(--card);padding:0.85rem 1rem;display:grid;grid-template-columns:minmax(7.5rem,auto) 1fr;gap:1rem;align-items:baseline}
+.copy dt{font-family:"IBM Plex Mono",monospace;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
+.copy dd{margin:0;font-size:0.94rem;line-height:1.5}
+
+/* sí / no */
+.vs{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:1.5rem}
+.vs > div{background:var(--card);padding:1.1rem 1.2rem 1.3rem}
+.vs h4{margin:0 0 0.8rem;font-family:"IBM Plex Mono",monospace;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase}
+.vs .yes h4{color:var(--ink)}
+.vs .no h4{color:var(--rouge)}
+.vs ul{list-style:none;margin:0;padding:0;display:grid;gap:0.45rem;font-size:0.9rem}
+.vs .no li{color:var(--soft);text-decoration:line-through;text-decoration-color:var(--rouge-line)}
+
+/* verificaciones del nombre */
+.checks{border:1px solid var(--rule);background:var(--card);margin-top:1.5rem}
+.checks div{padding:0.8rem 1rem;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:auto 1fr;gap:0.9rem;align-items:baseline;font-size:0.91rem}
+.checks div:last-child{border-bottom:0}
+.checks .st{font-family:"IBM Plex Mono",monospace;font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;padding:0.1rem 0.4rem;border:1px solid currentColor}
+.checks .busy{color:var(--rouge)}
+.checks .free{color:var(--soft)}
+
+footer{padding:clamp(2.25rem,5vw,3.5rem) 0 4rem;border-top:1px solid var(--rule);color:var(--muted);font-size:0.85rem}
+footer a{color:var(--soft)}
+footer ul{list-style:none;padding:0;margin:0.7rem 0 0;display:grid;gap:0.4rem}
+
+@media (prefers-reduced-motion:reduce){*{transition-duration:0.01ms !important;animation-duration:0.01ms !important}}
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">Manual de marca · <b>v1</b> · septiembre 2026</p>
+    <h1 class="display">Manual de AIMA</h1>
+    <p class="lede">Joyería de acero 316L con baño de oro y plata. Este documento define qué se vende, a quién, con qué palabras y con qué colores — y, sobre todo, qué no se dice.</p>
+
+    <dl class="spec">
+      <div><dt>Material</dt><dd>Acero inoxidable 316L<span>grado quirúrgico, bajo en níquel</span></dd></div>
+      <div><dt>Acabados</dt><dd>Dorado · plateado · perla<span>baño PVD, 1–3 micras</span></dd></div>
+      <div><dt>Categorías</dt><dd>Aretes · collares · pulseras<span>sin anillos, a propósito</span></dd></div>
+      <div><dt>Precio</dt><dd class="mono">$390 – $1,490 MXN<span>núcleo real: $590–$890</span></dd></div>
+      <div><dt>El look</dt><dd>tu stack<span>capas mezclando metales</span></dd></div>
+      <div><dt>La prueba</dt><dd>always on<span>agua, gym, regadera, dormida</span></dd></div>
+      <div><dt>Clienta</dt><dd>25–40 principal<span>18–28 secundaria</span></dd></div>
+      <div><dt>Voz</dt><dd>Spanglish, minúsculas<span>AIMA es la única palabra en altas</span></dd></div>
+    </dl>
+  </div>
+</header>
+
+<section id="negocio">
+  <div class="wrap">
+    <p class="eyebrow">01 · Qué se vende</p>
+    <h2 class="display">El negocio</h2>
+
+    <div class="prose">
+      <p>AIMA vende <strong>una sola cosa</strong>: piezas de acero 316L con baño, que se combinan entre sí y que no hay que quitarse. Todo lo demás — los acabados, las categorías, los precios — sale de ahí.</p>
+      <p>El acero no es un material barato disfrazado de otro: es un material <em>distinto</em>, con una ventaja que el oro macizo no tiene. No se oxida, no reacciona con el sudor y no pinta la piel de verde, porque no lleva cobre. Ese es el argumento de venta, y es verificable.</p>
+    </div>
+
+    <h3>Catálogo de arranque</h3>
+    <p class="prose">Doce a quince SKU. Ni uno más el primer año: cada modelo extra son tres acabados de inventario parado.</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Categoría</th><th>Piezas</th><th>Medidas</th><th>Precio</th><th>Rol en el negocio</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Aretes y arracadas</td>
+            <td>Arracada lisa · huggie · perla</td>
+            <td class="mm">Ø10 / Ø20 / Ø30 mm<br>perla 8 mm</td>
+            <td class="price">$390–$690</td>
+            <td>Entrada y recompra. Es lo que se compra sin pensarlo y lo que se vuelve a comprar.</td>
+          </tr>
+          <tr>
+            <td>Collares y cadenas</td>
+            <td>Figaro · rolo · choker · perla</td>
+            <td class="mm">38 / 45 / 50 cm<br>grosor 1.2–3 mm</td>
+            <td class="price">$590–$990</td>
+            <td>La estrella. Es la categoría que mejor se fotografía y la que comunica el stack.</td>
+          </tr>
+          <tr>
+            <td>Pulseras y tobilleras</td>
+            <td>Eslabón · cadena fina · tobillera</td>
+            <td class="mm">17–19 cm ajustable<br>tobillera 25 cm</td>
+            <td class="price">$490–$890</td>
+            <td>Upsell. Cierra el stack y casi nunca es la primera compra.</td>
+          </tr>
+          <tr>
+            <td>El stack <span class="mm">(set de 3)</span></td>
+            <td>1 arete + 1 collar + 1 pulsera</td>
+            <td class="mm">combinación fija</td>
+            <td class="price">$1,190–$1,490</td>
+            <td>Sube el ticket sin bajar el precio unitario. Es el producto más rentable del catálogo.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Por qué no hay anillos</h3>
+    <p class="prose">Un anillo necesita tallas 5 a 9: cinco SKU por modelo, por acabado. Un solo diseño se convierte en quince piezas de inventario, la mayoría muertas, más devoluciones por talla equivocada. Los anillos entran cuando haya datos de venta, no antes. Irónicamente el dedo verde es donde el acero más brilla como argumento — pero ese argumento se puede contar igual desde un collar.</p>
+
+    <div class="note">
+      <p><strong>La cuenta que ordena el catálogo.</strong> A este precio no se gana con margen por pieza, se gana con <strong>piezas por ticket</strong>. Todo el sistema — el nombre del look, la foto, el set, el correo — existe para que se compren dos o tres en vez de una. Si el ticket promedio se queda en una pieza, el negocio no cierra por más que se venda.</p>
+    </div>
+  </div>
+</section>
+
+<section id="clientas" class="band">
+  <div class="wrap">
+    <p class="eyebrow">02 · A quién le habla</p>
+    <h2 class="display">Las dos clientas</h2>
+
+    <p class="prose">No son un rango de edad, son dos comportamientos de compra distintos. Comparten una cosa y esa cosa es el terreno de la marca: <strong>las dos ya se quemaron con bisutería que les pintó la piel de verde.</strong></p>
+
+    <div class="cols" style="margin-top:2rem">
+      <div class="who">
+        <span class="tag">Principal · ~70% del ingreso</span>
+        <h3>La que se compra sola</h3>
+        <span class="age">28–38 · CDMX, Monterrey, Guadalajara</span>
+        <dl>
+          <dt>Cómo compra</dt>
+          <dd>Una o dos piezas buenas, decididas sola, sin pedir permiso ni esperar una fecha. Regresa en tres o cuatro meses.</dd>
+          <dt>Qué le importa</dt>
+          <dd>Que aguante el día completo con blusa de trabajo, gym y regadera sin cambiarse nada. Que llegue bien empacado.</dd>
+          <dt>Dónde la encuentras</dt>
+          <dd>Instagram y la recomendación de una amiga. No busca en Google.</dd>
+          <dt>Su objeción real</dt>
+          <dd>No es el precio. Es <em>"¿esto se va a poner feo en un mes?"</em></dd>
+        </dl>
+        <p class="quote">Le vendes tranquilidad: comprarla una vez y olvidarte.</p>
+      </div>
+
+      <div class="who">
+        <span class="tag">Secundaria · volumen y contenido</span>
+        <h3>La del stack</h3>
+        <span class="age">19–26 · nacional</span>
+        <dl>
+          <dt>Cómo compra</dt>
+          <dd>Por impulso, de noche, desde el celular. Prefiere tres piezas de $490 que una de $1,290.</dd>
+          <dt>Qué le importa</dt>
+          <dd>Que se vea bien en foto y que combine con lo que ya trae puesto. Compra el look completo, no la pieza.</dd>
+          <dt>Dónde la encuentras</dt>
+          <dd>TikTok y creadoras. El descubrimiento pasa por personas, nunca por buscadores.</dd>
+          <dt>Su objeción real</dt>
+          <dd>No es la duración. Es <em>"¿se ve barato?"</em></dd>
+        </dl>
+        <p class="quote">Le vendes pertenencia: su stack es suyo y no se parece al de nadie.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>Una marca, dos entradas.</strong> La misma pieza sirve a las dos si el mensaje cambia de puerta: a la primera se le habla de <em>durar</em>, a la segunda de <em>combinar</em>. No hay que partir la marca en dos líneas ni inventar una submarca juvenil. Es la misma joyería, contada por su lado correspondiente.</p>
+    </div>
+  </div>
+</section>
+
+<section id="discurso">
+  <div class="wrap">
+    <p class="eyebrow">03 · Qué se dice</p>
+    <h2 class="display">tu stack, always on</h2>
+
+    <div class="cols">
+      <div class="prose">
+        <h3 style="margin-top:0">El look: <em>tu stack</em></h3>
+        <p>Es lo aspiracional, lo que se publica y lo que se fotografía. El stack son <strong>dos o tres piezas juntas, mezclando dorado, plateado y perla</strong>, sobre la piel de alguien real.</p>
+        <p>Funciona porque coincide exacto con las tres categorías del catálogo, porque se sostiene igual con cualquier metal — y porque para armar un stack hay que comprar más de una pieza. El look y el negocio empujan en la misma dirección.</p>
+        <p>Se conjuga: <span class="mono">armar tu stack</span>, <span class="mono">stackear</span>, <span class="mono">stackeada</span>. Como etiqueta: <span class="mono">#aimastack</span>.</p>
+      </div>
+      <div class="prose">
+        <h3 style="margin-top:0">La prueba: <em>always on</em></h3>
+        <p>Es la capa técnica que hace creíble lo anterior. Acero 316L con baño PVD: <strong>agua, sudor, regadera, gym, alberca, dormida.</strong> No se quita nunca, y por eso el stack no se desarma.</p>
+        <p>Es una afirmación comprobable, y ese es justo su valor. El contenido se escribe solo: la misma cadena a los 30, 90 y 180 días. Como firma de marca: <span class="mono">aima. always on.</span></p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>El límite de la promesa — importante.</strong> «Always on» <strong>no aplica a las piezas con perla.</strong> La perla, sea cultivada o de vidrio recubierto, se opaca con el cloro, el perfume y el sudor: el nácar y el recubrimiento se degradan. Si se promete lo mismo para toda la línea, la reclamación llega sola en tres semanas y se pierde justo la credibilidad que se estaba construyendo.</p>
+      <p>Regla: «always on» se dice únicamente de las piezas 100% metal. Las de perla llevan su propia etiqueta — <em>«la perla es la única que sí te quitas»</em> — y eso, contado de frente, suma confianza en vez de restarla.</p>
+    </div>
+
+    <h3>Banco de copy</h3>
+    <p class="prose">Español de base, anglicismos donde ya se dicen así. Todo en minúsculas menos el nombre.</p>
+
+    <dl class="copy">
+      <div><dt>Firma</dt><dd>aima. always on.</dd></div>
+      <div><dt>Hero</dt><dd>arma tu stack. no te lo quitas.</dd></div>
+      <div><dt>Categoría</dt><dd>aretes · collares · pulseras · el stack</dd></div>
+      <div><dt>Ficha</dt><dd>arracada lisa · acero 316L con baño de oro · Ø20 mm · $590</dd></div>
+      <div><dt>Prueba social</dt><dd>día 94 con la misma cadena. regadera, gym, alberca. sigue igual.</dd></div>
+      <div><dt>Perla</dt><dd>la única que sí te quitas. perfume y cloro no le laten.</dd></div>
+      <div><dt>Agotado</dt><dd>sold out. va restock la otra semana.</dd></div>
+      <div><dt>Lanzamiento</dt><dd>drop nuevo: tres piezas, dos acabados, jueves 8 pm.</dd></div>
+      <div><dt>Correo</dt><dd>tu stack pide una capa más</dd></div>
+      <div><dt>Envío</dt><dd>envío gratis desde $899.</dd></div>
+      <div><dt>Botón</dt><dd>al carrito · shop el stack · ver la pieza</dd></div>
+    </dl>
+
+    <div class="vs">
+      <div class="yes">
+        <h4>Palabras de AIMA</h4>
+        <ul>
+          <li>stack, stackear, capas</li>
+          <li>always on, everyday</li>
+          <li>drop, restock, sold out</li>
+          <li>acero 316L, baño de oro</li>
+          <li>mezclar, combinar</li>
+          <li>no te la quitas</li>
+        </ul>
+      </div>
+      <div class="no">
+        <h4>Palabras prohibidas</h4>
+        <ul>
+          <li>joyería fina</li>
+          <li>lujo, exclusividad</li>
+          <li>elegancia atemporal</li>
+          <li>sostenible, consciente</li>
+          <li>«cada detalle», «la esencia de»</li>
+          <li>oro, a secas</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="prose" style="margin-top:1.3rem"><strong>Las dos últimas no son estilo, son riesgo.</strong> «Sostenible» en acero con baño no se sostiene y es greenwashing. Y llamarle «oro» a un baño es publicidad engañosa: siempre <em>baño de oro</em> o <em>gold plated</em>, en la ficha, en el empaque y en el anuncio.</p>
+  </div>
+</section>
+
+<section id="identidad" class="band">
+  <div class="wrap">
+    <p class="eyebrow">04 · Cómo se ve</p>
+    <h2 class="display">Identidad visual</h2>
+
+    <div class="prose">
+      <p>Una sola decisión gobierna todo lo demás: <strong>la interfaz no tiene color propio.</strong> El único color de la página es el metal de la pieza. Tres neutros hacen el 95% del trabajo y nunca compiten con el producto.</p>
+    </div>
+
+    <h3>Paleta</h3>
+    <div class="swatches">
+      <div class="sw"><span class="chip" style="background:#FDFCFA;box-shadow:inset 0 0 0 1px #DDD7CC"></span><div class="meta"><code>#FDFCFA</code><small>Papel. Fondo de página y de tarjeta.</small></div></div>
+      <div class="sw"><span class="chip" style="background:#F4F1EC"></span><div class="meta"><code>#F4F1EC</code><small>Hueso. Nav, footer, secciones alternas.</small></div></div>
+      <div class="sw"><span class="chip" style="background:#E8E1D6"></span><div class="meta"><code>#E8E1D6</code><small>Arena. Fondo de foto y bloques a sangre.</small></div></div>
+      <div class="sw"><span class="chip" style="background:#DDD7CC"></span><div class="meta"><code>#DDD7CC</code><small>Línea. Separadores y bordes.</small></div></div>
+      <div class="sw"><span class="chip" style="background:#26262A"></span><div class="meta"><code>#26262A</code><small>Grafito. Texto, iconos, botones.</small></div></div>
+      <div class="sw"><span class="chip" style="background:#6B6A67"></span><div class="meta"><code>#6B6A67</code><small>Grafito suave. Texto secundario.</small></div></div>
+    </div>
+
+    <div class="note">
+      <p><strong>Por qué grafito y no café.</strong> Se venden dos metales. Un neutro cálido (café, terracota) favorece al dorado pero ensucia el plateado: lo hace ver gris y apagado. El grafito no tiene temperatura, así que las dos familias de producto se ven bien sobre el mismo fondo. Es una decisión de catálogo disfrazada de decisión de color.</p>
+    </div>
+
+    <h3>Tipografía</h3>
+
+    <div class="specimen">
+      <span class="label">Display · Aboreto · solo wordmark y titulares</span>
+      <p class="wordmark">AIMA</p>
+      <p class="wordmark-note">Aboreto · mayúsculas · <span class="mono">letter-spacing: 0.24em</span> · nunca en texto corrido</p>
+    </div>
+
+    <div class="specimen sans-spec">
+      <span class="label">Texto · Instrument Sans · todo lo demás</span>
+      <p class="big">arma tu stack. no te lo quitas.</p>
+      <p class="lbl">acero 316L · baño de oro</p>
+      <p class="bd">Navegación, precios, fichas, botones y footer. Dos pesos y medio: 400 para texto, 500 para nombres de producto, 600 para etiquetas en mayúsculas. La jerarquía sale de tamaño y tracking, no de agregar familias.</p>
+    </div>
+
+    <p class="prose" style="margin-top:1.4rem"><strong>La regla que resuelve el choque.</strong> Aboreto es una display decorativa y el tono de la marca es coloquial: puestas juntas se pelean. Se resuelve con una sola regla — <strong>AIMA es la única palabra en mayúsculas de toda la marca.</strong> Menú, titulares, botones y fichas van en minúsculas. El wordmark se vuelve lo único ceremonioso de la página, y por contraste se ve más caro.</p>
+
+    <p class="prose">Tracking, heredado de cómo lo hace la buena tipografía comercial: <strong>texto grande → tracking negativo</strong> (<span class="mono">-0.02em</span>); <strong>texto chico en mayúsculas → tracking positivo</strong> (<span class="mono">+0.09em</span>). Es lo único que hay que saber para que una grotesca se vea cara.</p>
+
+    <h3>Forma y movimiento</h3>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Elemento</th><th>Valor</th><th>Por qué</th></tr></thead>
+        <tbody>
+          <tr><td>Marco de página</td><td><code>padding: 2.25vw</code></td><td>Todo el sitio queda dentro de una tarjeta con margen. Cuesta una línea y hace que parezca editorial en vez de tienda.</td></tr>
+          <tr><td>Radio de paneles</td><td><code>12px</code></td><td>Secciones a sangre, hero, menú móvil</td></tr>
+          <tr><td>Radio de botones</td><td><code>999px</code></td><td>Píldora total, siempre</td></tr>
+          <tr><td>Bordes</td><td><code>box-shadow: inset 0 0 0 1px</code></td><td>Nunca <code>border</code>: no altera el layout y se anima con el resto</td></tr>
+          <tr><td>Sombras</td><td>Ninguna</td><td>Sin excepción. La profundidad la da el contraste de superficie.</td></tr>
+          <tr><td>Curva de easing</td><td><code>cubic-bezier(.76,0,.24,1)</code></td><td>Una sola, en todo. Arranca y frena fuerte: se siente mecánica y cara.</td></tr>
+          <tr><td>Duraciones</td><td><code>.7s</code> / <code>.25s</code></td><td>Lento a propósito. Funciona solo porque hay muy pocos elementos animados.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Vista previa</h3>
+    <div class="preview">
+      <span class="pvlabel">Ficha de producto con los tokens aplicados · pasa el cursor sobre el botón desde distintos lados</span>
+      <div class="pvcard">
+        <p class="pvmark">AIMA</p>
+        <div class="pvswatch" role="img" aria-label="Espacio de fotografía: arracada dorada sobre fondo arena"></div>
+        <p class="pvname">arracada lisa</p>
+        <p class="pvspec">acero 316L · baño de oro · Ø20 mm</p>
+        <p class="pvprice">$590 MXN</p>
+        <button class="rb" type="button">
+          <span>al carrito</span>
+          <span class="rb-hit" data-i="1"></span><span class="rb-hit" data-i="2"></span>
+          <span class="rb-hit" data-i="3"></span><span class="rb-hit" data-i="4"></span>
+          <span class="rb-fill" data-i="1" aria-hidden="true">al carrito</span>
+          <span class="rb-fill" data-i="2" aria-hidden="true">al carrito</span>
+          <span class="rb-fill" data-i="3" aria-hidden="true">al carrito</span>
+          <span class="rb-fill" data-i="4" aria-hidden="true">al carrito</span>
+        </button>
+      </div>
+    </div>
+    <p class="prose" style="margin-top:1rem">El relleno del botón <strong>entra por el mismo borde por el que entró el cursor</strong>: cuatro zonas triangulares de detección y cuatro copias recortadas con <code>clip-path</code>. Veinte líneas de CSS, cero JavaScript, y es el detalle que la gente recuerda del sitio.</p>
+
+    <h3>Tokens</h3>
+<pre><code>:root{
+  /* superficie */
+  --papel:#FDFCFA;
+  --hueso:#F4F1EC;
+  --arena:#E8E1D6;
+  --linea:#DDD7CC;
+
+  /* tinta */
+  --grafito:#26262A;
+  --grafito-suave:#6B6A67;
+
+  /* forma */
+  --r-panel:12px;
+  --r-pill:999px;
+  --marco:2.25vw;
+
+  /* movimiento */
+  --ease:cubic-bezier(.76,0,.24,1);
+  --dur:.7s;
+  --dur-rapido:.25s;
+
+  /* tipografía */
+  --display:Aboreto, Georgia, serif;
+  --texto:"Instrument Sans", Archivo, Helvetica, Arial, sans-serif;
+}</code></pre>
+  </div>
+</section>
+
+<section id="aplicacion">
+  <div class="wrap">
+    <p class="eyebrow">05 · Cómo se aplica</p>
+    <h2 class="display">La foto es el 80%</h2>
+
+    <div class="prose">
+      <p>Este sistema visual es un marco neutro cuyo único color viene de la fotografía. Sin foto, no hay marca — solo una página beige vacía y elegante que no comunica nada. Hoy hay <strong>una sola imagen</strong>, así que esto es lo primero que hay que resolver, y se puede resolver con un celular.</p>
+    </div>
+
+    <h3>Cómo fotografiar con celular</h3>
+    <ul class="clean">
+      <li><strong>Luz:</strong> junto a una ventana, con luz indirecta. Un mediodía nublado es la mejor luz que existe para metal. Nunca flash: aplana la pieza y le mata el brillo.</li>
+      <li><strong>Fondo:</strong> una hoja de papel color arena o una tela de lino sin planchar. <strong>Nunca fondo blanco puro</strong> — el plateado desaparece contra el blanco y el dorado se ve amarillo sucio.</li>
+      <li><strong>Encuadre:</strong> cerrado. La pieza ocupa 60–70% del cuadro. En joyería chica, el aire vacío se lee como foto de catálogo de proveedor.</li>
+      <li><strong>Tres tomas por pieza,</strong> siempre las mismas: (1) sola sobre fondo, (2) puesta en piel, (3) en stack con otras dos.</li>
+      <li><strong>La toma en piel no es opcional.</strong> El acero dorado solo se lee como oro cuando hay piel al lado que le sirva de referencia. Sobre fondo neutro y sin piel, se ve como metal amarillo.</li>
+      <li><strong>Mezcla los metales en la foto de stack.</strong> Es la manera más directa de decirle a la clienta que puede comprar los dos.</li>
+    </ul>
+
+    <div class="note">
+      <p><strong>Sobre la imagen generada con IA.</strong> Sirve para probar el diseño, no para vender. Una foto que no corresponde a la pieza que llega a la casa genera devoluciones y reseñas malas — y en joyería chica la diferencia se nota en la primera foto que la clienta se toma. Úsala en el prototipo y sustitúyela por producto real antes de la primera venta.</p>
+    </div>
+
+    <h3>Instagram</h3>
+    <ul class="clean">
+      <li>La retícula es el catálogo. Alterna un ritmo fijo: pieza sola · puesta en piel · stack. Repetido, se lee como sistema.</li>
+      <li>El contenido de <em>always on</em> es el que más rinde y el más barato de hacer: la misma pieza a los 30, 90 y 180 días, con fecha visible.</li>
+      <li>Las dos clientas viven en formatos distintos: la de 30 años ve la retícula, la de 22 ve reels. Mismo producto, distinto corte.</li>
+    </ul>
+
+    <h3>Empaque</h3>
+    <ul class="clean">
+      <li>Bolsa de tela color arena y una tarjeta impresa en un solo tinta grafito. Nada de cajas rígidas a este precio: se nota que el costo se fue en la caja.</li>
+      <li>La tarjeta lleva el cuidado por escrito: <em>always on</em> para metal, y la excepción de la perla explícita. Esa tarjeta previene la mayoría de las reclamaciones.</li>
+      <li>La bolsa hace doble trabajo: es empaque y es donde se guarda. Le da a la pieza un lugar propio y baja la pérdida.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="nombre" class="band">
+  <div class="wrap">
+    <p class="eyebrow">06 · Riesgos</p>
+    <h2 class="display">El nombre</h2>
+
+    <p class="prose">AIMA se queda. Pero es un nombre corto y común, y eso tiene consecuencias concretas. Esto es lo que se verificó el 6 de septiembre de 2026.</p>
+
+    <h4>Colisión encontrada</h4>
+    <p class="prose">Existe una marca <strong>AIMA</strong> española que vende accesorios y joyería en <span class="mono">aimastore.com</span>. Su dominio resuelve a <span class="mono">23.227.38.68</span>, que es la IP de Shopify: es una tienda activa, no un dominio dormido. Está en la misma categoría de producto. El riesgo inmediato no es legal — es de <strong>SEO y de confusión</strong>: al buscar «AIMA joyería» se compite contra una tienda con años de antigüedad.</p>
+
+    <h4>Dominios</h4>
+    <div class="checks">
+      <div><span class="st busy">ocupado</span><span><span class="mono">aima.mx</span> — resuelve a <span class="mono">15.197.225.128</span>, dominio estacionado</span></div>
+      <div><span class="st busy">ocupado</span><span><span class="mono">aimastore.com</span> — la marca española, en Shopify</span></div>
+      <div><span class="st free">libre</span><span><span class="mono">aimajoyeria.com</span> — sin registro DNS</span></div>
+      <div><span class="st free">libre</span><span><span class="mono">aimajoyeria.mx</span> — sin registro DNS</span></div>
+      <div><span class="st free">libre</span><span><span class="mono">aima.com.mx</span> — sin registro DNS</span></div>
+      <div><span class="st free">libre</span><span><span class="mono">aimajewelry.com</span> — sin registro DNS</span></div>
+    </div>
+    <p class="prose" style="margin-top:1rem;font-size:0.9rem;color:var(--soft)">«Libre» significa que hoy no resuelve DNS. Es un indicio fuerte, no una confirmación de registro: hay que verificarlo en el registrador antes de pagar.</p>
+
+    <h4>Significado en otros idiomas</h4>
+    <p class="prose">En griego, <span class="mono">αίμα</span> (<em>aima</em>) significa <strong>sangre</strong> — es la raíz de hemoglobina, hematoma y anemia. Comercialmente en México el riesgo es nulo: nadie lo va a leer así. Vale la pena saberlo únicamente para no quedarse callada el día que alguien lo mencione, y para descartar de entrada cualquier idea de expandir a Grecia con ese nombre.</p>
+
+    <h4>Qué hay que hacer, en este orden</h4>
+    <ul class="clean">
+      <li><strong>Apartar la arroba en Instagram y TikTok hoy</strong>, aunque todavía no se publique nada. Es gratis y es lo único que no se puede recuperar después.</li>
+      <li><strong>Comprar el dominio antes de publicar.</strong> <span class="mono">aimajoyeria.mx</span> es el mejor de los libres: dice categoría y país, y no compite con la marca española.</li>
+      <li><strong>Búsqueda fonética en MARCANET (IMPI), clase 14</strong> — joyería. Es gratis y se hace en línea antes de gastar en el registro.</li>
+      <li><strong>Registrar la marca mixta, no la denominativa.</strong> «AIMA» a secas es corto y genérico: difícil de registrar sola. Con el logotipo — o con un apellido — la probabilidad sube mucho.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="no">
+  <div class="wrap">
+    <p class="eyebrow">07 · Errores caros</p>
+    <h2 class="display">Qué no hacer</h2>
+
+    <ul class="clean">
+      <li><strong>No llamarle «oro».</strong> Siempre «baño de oro» o «gold plated», en la ficha, el empaque y el anuncio. Describir un baño como oro macizo es publicidad engañosa y PROFECO sí actúa sobre eso.</li>
+      <li><strong>No prometer «always on» en las piezas con perla.</strong> Es la única excepción de la línea y hay que decirla, no esconderla.</li>
+      <li><strong>No hablar de sostenibilidad.</strong> En acero con baño no se sostiene. El prototipo anterior traía un bloque entero de «joyería consciente» y materiales reciclados: se elimina completo.</li>
+      <li><strong>No abrir con 40 SKU.</strong> Doce a quince. Cada modelo extra son tres acabados de inventario parado en la sala de la casa.</li>
+      <li><strong>No meter anillos todavía.</strong> Las tallas multiplican el inventario por cinco antes de tener un solo dato de venta.</li>
+      <li><strong>No pagar una tienda en línea antes de las primeras 30 ventas.</strong> Instagram y WhatsApp cierran ventas sin mensualidad. La tienda se paga cuando responder mensajes a mano ya no da abasto.</li>
+      <li><strong>No fotografiar sobre fondo blanco puro.</strong> Es el error más común y el que hace ver barata la pieza.</li>
+      <li><strong>No poner modal de país o de cupón al entrar.</strong> Interrumpe antes de que nadie haya visto nada.</li>
+      <li><strong>No copiar precios ni categorías del prototipo viejo.</strong> Traía oro 18k, diamantes y anillos: nada de eso es AIMA.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="eyebrow">Método</p>
+    <p style="max-width:64ch;margin:0 0 1.3rem">Las decisiones de producto, público, discurso y estética las definió la propietaria del proyecto en septiembre de 2026. Las verificaciones de dominio se hicieron por consulta DNS directa contra <span class="mono">8.8.8.8</span> el 6 de septiembre de 2026, y la existencia de la marca homónima se confirmó por búsqueda web. La estructura del documento y los principios de tipografía, forma y movimiento se apoyan en el teardown de rhodeskin.com hecho para este mismo proyecto.</p>
+    <ul>
+      <li><a href="https://aimastore.com/en/collections/jewelry" target="_blank" rel="noopener">aimastore.com</a> — la marca homónima, colección de joyería</li>
+      <li><a href="https://tumarca.com/marcas/registro-de-marcas/" target="_blank" rel="noopener">Registro de marcas ante el IMPI</a> — proceso, clase 14 y costos</li>
+      <li><a href="https://etimologias.dechile.net/?cruento=" target="_blank" rel="noopener">Etimología de <em>aima</em></a> — la raíz griega</li>
+    </ul>
+  </div>
+</footer>
